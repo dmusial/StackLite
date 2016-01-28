@@ -37,7 +37,7 @@ namespace StackLight.Core.UI.Controllers
         }
         
         [HttpPost]
-        [RouteAttribute("ask")]
+        [Route("ask")]
         public IActionResult Ask([FromBody]AskQuestionModel questionModel)
         {
             User user = new User("dmusial");

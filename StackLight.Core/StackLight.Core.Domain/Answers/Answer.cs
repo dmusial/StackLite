@@ -6,7 +6,7 @@ namespace StackLight.Core.Domain.Answers
 {
     public class Answer
     {
-        public Answer(Question question, string content, User answeredBy)
+        internal Answer(Question question, string content, User answeredBy)
         {
             Id = Guid.NewGuid();
             ForQuestionId = question.Id;

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using StackLight.Core.Domain.Questions;
+using StackLight.Core.Domain.Answers;
 using StackLight.Core.Persistance;
 
 namespace StackLight.Core.UI
@@ -25,6 +26,7 @@ namespace StackLight.Core.UI
             services.AddMvc();
             
             services.AddSingleton<IQuestionRepository, QuestionRepository>();
+            services.AddSingleton<IAnswerRepository, AnswerRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
