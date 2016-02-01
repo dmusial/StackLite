@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0-*",
+  "description": "StackLite.Core.Persistance Class Library",
+  "authors": [ "Class Library template" ],
+  "tags": [""],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "tooling": {
+    "defaultNamespace": "StackLite.Core.Persistance"
+  },
+
+  "frameworks": {
+    "net451": {
+        "dependencies": {
+            "StackLite.Core.Domain": "1.0.0-*"
+        }
+     }
+  }
+}
