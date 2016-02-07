@@ -1,36 +1,35 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Microsoft.Extensions.Logging;
 using StackLite.Core.Domain.Answers;
 
 namespace StackLite.Core.Persistance
 {
     public class AnswerRepository : IAnswerRepository
     {
-        private List<Answer> _answers;
-        public AnswerRepository()
+        private readonly ILogger _logger;
+        private readonly IEventStore _eventStore;
+        
+        public AnswerRepository(IEventStore eventStore, ILogger logger)
         {
-            _answers = new List<Answer>();
-        }
-
-        public void Add(Answer answer)
-        {
-            _answers.Add(answer);
+            _eventStore = eventStore;
+            _logger = logger;
         }
 
         public Answer Get(Guid answerId)
         {
-            return _answers.FirstOrDefault(a => a.Id == answerId);
+            var events = _eventStore.GetEventsForAggregate(answerId);
+            return new Answer(events);
         }
 
         public List<Answer> GetAllFor(Guid questionId)
         {
-            return _answers.Where(a => a.ForQuestionId == questionId).ToList();    
+            return new List<Answer>();    
         }
 
-        public void Save()
+        public void Save(Answer answer)
         {
-            
+            _eventStore.SaveEvents(answer.Id, answer.GetUncommittedEvents());
         }
     }
 }

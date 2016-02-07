@@ -6,6 +6,8 @@ using Microsoft.Extensions.Logging;
 using StackLite.Core.Domain.Questions;
 using StackLite.Core.Domain.Answers;
 using StackLite.Core.Persistance;
+using StackLite.Core.EventHandlers;
+using StackLite.Core.FakeReportingStores;
 
 namespace StackLite.Core.UI
 {
@@ -24,16 +26,36 @@ namespace StackLite.Core.UI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            var serviceProvider = services.BuildServiceProvider();
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            ConfigureLogging(loggerFactory);
+
+            var questionsStore = new QuestionsStore();
+            var publisher = new MessageBus(loggerFactory);
+            var questionHandler = new QuestionHandler(questionsStore, loggerFactory);
+
+            services.AddInstance<IEventPublisher>(publisher);
+            services.AddSingleton<IEventStore, EventStore>();
             
+            services.AddInstance<IQuestionsStore>(questionsStore);
             services.AddSingleton<IQuestionRepository, QuestionRepository>();
+            services.AddSingleton<IQuestionsQuery, QuestionsQuery>();        
+            
             services.AddSingleton<IAnswerRepository, AnswerRepository>();
+            
+            publisher.RegisterHandler<QuestionAsked>(questionHandler.Handle);
+            publisher.RegisterHandler<QuestionAmended>(questionHandler.Handle);        
+        }
+
+        private void ConfigureLogging(ILoggerFactory loggerFactory)
+        {
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddDebug();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

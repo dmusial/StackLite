@@ -7,7 +7,6 @@ namespace StackLite.Core.Domain.Answers
     {
         Answer Get(Guid answerId);
         List<Answer> GetAllFor(Guid questionId);
-        void Add(Answer answer);
-        void Save();
+        void Save(Answer answer);
     }
 }
