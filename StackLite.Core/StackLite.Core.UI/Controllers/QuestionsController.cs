@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using StackLite.Core.Domain.Questions;
 using StackLite.Core.Domain.Users;
+using StackLite.Core.FakeReportingStores;
 using StackLite.Core.Persistance;
 using StackLite.Core.UI.Models;
 
@@ -23,12 +25,19 @@ namespace StackLite.Core.UI.Controllers
         }
         
         [HttpGet]
-        public string Index()
+        public List<QuestionData> Index()
         {
-            int questionsCount = _questionsQuery.AllQuestionsCount();
-            return string.Format("Welcome to StackLite! We're currently tracking {0} question(s)!", questionsCount);
+            return _questionsQuery.AllQuestions();
+            
         }
         
+       [HttpGet("info")]
+       public string Info()
+        {
+            int questionsCount = _questionsQuery.AllQuestionsCount();
+            return $"Welcome to StackLite! We're currently tracking {questionsCount} question(s)!";
+        }
+
         [HttpGet("{id}")]
         public IActionResult Get(Guid id)
         {
@@ -40,7 +49,6 @@ namespace StackLite.Core.UI.Controllers
         }
         
         [HttpPost]
-        [Route("ask")]
         public IActionResult Ask([FromBody]AskQuestionModel questionModel)
         {
             User user = new User("dmusial");

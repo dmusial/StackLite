@@ -67,7 +67,8 @@ namespace StackLite.Core.UI
 
             app.UseIISPlatformHandler();
 
-            app.UseStaticFiles();
+            app.UseFileServer();
+
 
             app.UseMvc(routes =>
             {

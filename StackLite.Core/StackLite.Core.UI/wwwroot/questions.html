@@ -1,0 +1,23 @@
+  <md-content >
+ <section>
+  <md-subheader >Latest questions</md-subheader>
+ <md-list   ng-cloak>
+
+  <md-list-item ng-repeat="a in questions" ui-sref="question-details({id:a.Id})" >
+    <p>{{a.Content | limitTo:200}}</p>
+    <md-icon  aria-label="question_answer" class="md-secondary md-hue-3" >{{question_answer}}</md-icon>
+  </md-list-item>
+</md-list>
+
+</section>
+  </md-content >
+<!--   <div class="row marketing">
+      
+
+      <p ng-repeat-start="a in [1,2,3,4,5,6]">
+      <a ui-sref="question-details({id:a})" >
+
+      Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</a></p>
+      <hr ng-repeat-end>
+  </div>
+ -->
