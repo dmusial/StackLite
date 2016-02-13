@@ -4,6 +4,7 @@ using Microsoft.AspNet.Mvc;
 using StackLite.Core.Domain.Answers;
 using StackLite.Core.Domain.Questions;
 using StackLite.Core.Domain.Users;
+using StackLite.Core.Persistance;
 using StackLite.Core.UI.Models;
 
 namespace StackLite.Core.UI.Controllers
@@ -13,18 +14,20 @@ namespace StackLite.Core.UI.Controllers
     {
         private readonly IAnswerRepository _answerRepository;
         private readonly IQuestionRepository _questionRepository;
+        private readonly IAnswersQuery _answersQuery;
         
-        public AnswersController(IAnswerRepository answerRepository, IQuestionRepository questionRepository)
+        public AnswersController(IAnswerRepository answerRepository, IQuestionRepository questionRepository, IAnswersQuery answersQuery)
         {
             _answerRepository = answerRepository;
             _questionRepository = questionRepository;
+            _answersQuery = answersQuery;
         }
         
         [HttpGet("{id}")]
         [Route("for/{id}")]
         public IActionResult For(Guid id)
         {
-            var answers = _answerRepository.GetAllFor(id);
+            var answers = _answersQuery.GetAllForQuestion(id);
             
             if (!answers.Any())
                 return new ObjectResult("No answers for this question so far.");

@@ -10,10 +10,10 @@ namespace StackLite.Core.Persistance
         private readonly ILogger _logger;
         private readonly IEventStore _eventStore;
         
-        public AnswerRepository(IEventStore eventStore, ILogger logger)
+        public AnswerRepository(IEventStore eventStore, ILoggerFactory loggerFactory)
         {
             _eventStore = eventStore;
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger<AnswerRepository>();
         }
 
         public Answer Get(Guid answerId)
