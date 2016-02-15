@@ -19,7 +19,7 @@ angular.module('stackLite')
     .service('questionAnswerService', function($resource) {
         return function(questionId) {
            
-            var answers = $resource("api/question/"+questionId+"/answers/:answerId:suffix", {
+            var answers = $resource("question/"+questionId+"/answers/:answerId:suffix", {
                 answerId: '@answerId',
                 suffix:'@suffix'
             }, {
