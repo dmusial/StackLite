@@ -7,19 +7,26 @@ angular.module('stackLite')
             answerService.suggest(answerModel)
             .then(function() {
                     $scope.newAnswer = "";
+                    $scope.answers = answerService.getAll();
+
                 });
         }
         $scope.upvote = function(answer) {
-            answerService.upvote(answerId);
+            answerService.upvote(answer.Id).then(function(a){
+                answer.VoteScore = a.VoteScore;
+            });
+            
         }
-        $scope.downvote = function(answerId) {
-            answerService.down(answerId);
+        $scope.downvote = function(answer) {
+            answerService.downvote(answer.Id).then(function(a){
+                answer.VoteScore = a.VoteScore;
+            });
         }
     })
     .service('questionAnswerService', function($resource) {
         return function(questionId) {
            
-            var answers = $resource("question/"+questionId+"/answers/:answerId:suffix", {
+            var answers = $resource("question/"+questionId+"/answers/:answerId/:suffix", {
                 answerId: '@answerId',
                 suffix:'@suffix'
             }, {
@@ -29,13 +36,13 @@ angular.module('stackLite')
                 upvote:{
                     method:'PUT',
                     params:{
-                        suffix:'/upvote'
+                        suffix:'upvote'
                     }
                 },
                 downvote:{
                     method:'PUT',
                     params:{
-                        suffix:'/downvote'
+                        suffix:'downvote'
                     }
                 }
             });
@@ -44,14 +51,14 @@ angular.module('stackLite')
 
             return {
                 getAll: answers.query,
-                upvote:function(answersId) {
+                upvote:function(answerId) {
                     return answers.upvote({ answerId: answerId }).$promise;
                 },
-                downvote:function(answersId) {
+                downvote:function(answerId) {
                     return answers.downvote({ answerId: answerId }).$promise;
                 },
                 suggest: function(answerModel) {
-                    return answers.save({ 'answerContent': answerModel }).$promise;
+                    return answers.save({ 'answerContent': answerModel, QuestionId: questionId }).$promise;
                 },
                 amend: function(answerModel) {
                     return answers.put({

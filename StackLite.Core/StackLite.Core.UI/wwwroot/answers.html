@@ -11,9 +11,9 @@
                     <div class="row" ng-repeat-start="a in answers">
                         <div class="col-xs-1 text-right" style="font-size: 26px">
                             <div class="text-center">
-                                <i class="fa  fa-chevron-up text-muted" ng-click="upvoute(a)" style="display: block"></i>
-                                <span style="display: block" class="text-muted">{{::a.VoteScore}}</span>
-                                <i class="fa fa-chevron-down text-muted"  ng-click="downvoute(a)"  style="display: block"></i>
+                                <i class="fa  fa-chevron-up text-muted" ng-click="$parent.upvote(a)" style="display: block"></i>
+                                <span style="display: block" class="text-muted">{{a.VoteScore}}</span>
+                                <i class="fa fa-chevron-down text-muted"  ng-click="$parent.downvote(a)"  style="display: block"></i>
                                 <i class="fa fa-star-o text-muted" style="display: block; margin-top: 10px"></i>
                             </div>
                         </div>
