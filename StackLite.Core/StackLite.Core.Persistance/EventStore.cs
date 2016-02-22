@@ -1,66 +1,101 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StackLite.Core.Domain.Common;
 
 namespace StackLite.Core.Persistance
 {
-public class EventStore : IEventStore
-{
+    public class EventStore : IEventStore
+    {
         private struct EventDescriptor
         {
+            public Guid EventId { get; set; }
+            public string EventType { get; set; }
+            public readonly Event Data;
 
-            public readonly Event EventData;
-            public readonly Guid Id;
-
-            public EventDescriptor(Guid id, Event eventData)
+            public EventDescriptor(Guid eventId, string eventType, Event data)
             {
-                EventData = eventData;
-                Id = id;
+                EventId = eventId;
+                EventType = eventType;
+                Data = data;
+            }
+        }
+     
+        private readonly string _embedEventContentSwitch = "?embed=body";
+        private ILogger _logger;
+     
+        public EventStore(ILoggerFactory loggerFactory)
+        {
+            _logger = loggerFactory.CreateLogger<EventStore>();       
+        }
+        
+        public List<Event> GetEventsForAggregate(Guid aggregateId)
+        {
+            using (var client = new HttpClient())
+            {
+                var streamName = BuildStreamName(aggregateId);
+                client.BaseAddress = new Uri("http://localhost:2113/streams/");
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.eventstore.atom+json"));
+                var response = client.GetAsync(streamName + _embedEventContentSwitch).Result;
+                
+                var responseContent = response.Content.ReadAsStringAsync().Result;
+                var parsedResponse = JObject.Parse(responseContent);
+                var eventsData = parsedResponse["entries"];
+                
+                Event[] events = new Event[eventsData.Count()];
+                foreach (var eventEntry in eventsData)
+                {
+                    var eventTypeName = (string)eventEntry["eventType"];
+                    var eventData = JsonConvert.SerializeObject(eventEntry["data"]);
+                    
+                    var @event = EventDeserializer.Deserialize(eventTypeName, eventData);
+                    
+                    int eventNumber = int.Parse((string)eventEntry["eventNumber"]);
+                    events[eventNumber] = @event;
+                }
+                
+                return events.ToList();
             }
         }
 
-        private readonly IEventPublisher _eventPublisher;
-
-        private readonly Dictionary<Guid, List<EventDescriptor>> _current = new Dictionary<Guid, List<EventDescriptor>>();
-
-        public EventStore(IEventPublisher eventPublisher)
+        private string ClearEventData(string eventData)
         {
-            _eventPublisher = eventPublisher;
+            return eventData.Trim('\"').Replace("\\r\\n", "").Replace("\\", "");
         }
 
         public void SaveEvents(Guid aggregateId, IEnumerable<Event> events)
         {
-            List<EventDescriptor> eventDescriptors;
-
-            if(!_current.TryGetValue(aggregateId, out eventDescriptors))
-            {
-                eventDescriptors = new List<EventDescriptor>();
-                _current.Add(aggregateId, eventDescriptors);
-            }
-
             foreach (var @event in events)
             {
-                eventDescriptors.Add(new EventDescriptor(aggregateId, @event));
-                _eventPublisher.Publish(@event);
+                string streamName = BuildStreamName(aggregateId);
+                SaveEvent(@event, streamName);
             }
         }
 
-
-        public  List<Event> GetEventsForAggregate(Guid aggregateId)
+        private async void SaveEvent(Event @event, string streamName)
         {
-            List<EventDescriptor> eventDescriptors;
-
-            if (!_current.TryGetValue(aggregateId, out eventDescriptors))
+            var eventDescriptor = new EventDescriptor(Guid.NewGuid(), @event.GetType().Name, @event);
+            var serializedEvent = JsonConvert.SerializeObject(new EventDescriptor[] { eventDescriptor });
+            
+            using (var client = new HttpClient())
             {
-                throw new AggregateNotFoundException();
+                client.BaseAddress = new Uri("http://localhost:2113/streams/");
+                var response = await client.PostAsync(streamName, new StringContent(serializedEvent, Encoding.UTF8, "application/vnd.eventstore.events+json"));
+                
+                _logger.LogInformation(string.Format("Saving event {0} to stream resulted with {1}", eventDescriptor.EventType, response.StatusCode));
             }
-
-            return eventDescriptors.Select(desc => desc.EventData).ToList();
         }
-    }
-
-    public class AggregateNotFoundException : Exception
-    {
+        
+        private string BuildStreamName(Guid aggregateId)
+        {
+            return aggregateId.ToString();
+        }
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using StackLite.Core.FakeReportingStores;
+using StackLite.Core.Persistance.ReadModels;
 
 namespace StackLite.Core.Persistance
 {
@@ -12,16 +12,12 @@ namespace StackLite.Core.Persistance
 
     public class AnswersQuery : IAnswersQuery
     {
-        private readonly IAnswersStore _answersStore;
-        
-        public AnswersQuery(IAnswersStore answersStore)
-        {
-            _answersStore = answersStore;
-        }
-        
         public List<AnswerData> GetAllForQuestion(Guid questionId)
         {
-            return _answersStore.Answers.Where(a => a.QuestionId == questionId).ToList();
+            using (var context = new ReadContext())
+            {
+                return context.Answers.Where(a => a.QuestionId == questionId).ToList();
+            }
         }
     }
 }

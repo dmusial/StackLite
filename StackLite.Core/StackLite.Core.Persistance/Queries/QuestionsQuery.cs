@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using StackLite.Core.FakeReportingStores;
+using StackLite.Core.Persistance.ReadModels;
 
 namespace StackLite.Core.Persistance
 {
@@ -12,21 +12,20 @@ namespace StackLite.Core.Persistance
 
     public class QuestionsQuery : IQuestionsQuery
     {
-        private readonly IQuestionsStore _store;
-        
-        public QuestionsQuery(IQuestionsStore store)
-        {
-            _store = store;
-        }
-        
         public int AllQuestionsCount()
         {
-            return _store.Questions.Count;
+            using (var context = new ReadContext())
+            {
+                return context.Questions.Count();
+            }
         }
 
         public QuestionData GetQuestionDetails(Guid questionId)
         {
-            return _store.Questions.FirstOrDefault(q => q.Id == questionId);
+            using (var context = new ReadContext())
+            {
+                return context.Questions.FirstOrDefault(q => q.Id == questionId);
+            }
         }
     }
 }

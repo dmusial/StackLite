@@ -6,8 +6,6 @@ using Microsoft.Extensions.Logging;
 using StackLite.Core.Domain.Questions;
 using StackLite.Core.Domain.Answers;
 using StackLite.Core.Persistance;
-using StackLite.Core.EventHandlers;
-using StackLite.Core.FakeReportingStores;
 
 namespace StackLite.Core.UI
 {
@@ -31,30 +29,16 @@ namespace StackLite.Core.UI
             var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
             ConfigureLogging(loggerFactory);
 
-            var questionsStore = new QuestionsStore();
             var publisher = new MessageBus(loggerFactory);
-            var questionHandler = new QuestionHandler(questionsStore, loggerFactory);
-            
-            var answersStore = new AnswersStore();
-            var answerHandler = new AnswerHandler(answersStore);         
 
             services.AddInstance<IEventPublisher>(publisher);
             services.AddSingleton<IEventStore, EventStore>();
             
-            services.AddInstance<IQuestionsStore>(questionsStore);
             services.AddSingleton<IQuestionRepository, QuestionRepository>();
             services.AddSingleton<IQuestionsQuery, QuestionsQuery>();        
             
-            services.AddInstance<IAnswersStore>(answersStore);
             services.AddSingleton<IAnswerRepository, AnswerRepository>();
             services.AddSingleton<IAnswersQuery, AnswersQuery>();            
-            
-            publisher.RegisterHandler<QuestionAsked>(questionHandler.Handle);
-            publisher.RegisterHandler<QuestionAmended>(questionHandler.Handle);
-            publisher.RegisterHandler<AnswerSuggested>(answerHandler.Handle);    
-            publisher.RegisterHandler<AnswerAmended>(answerHandler.Handle);    
-            publisher.RegisterHandler<AnswerUpvoted>(answerHandler.Handle);    
-            publisher.RegisterHandler<AnswerDownvoted>(answerHandler.Handle);    
         }
 
         private void ConfigureLogging(ILoggerFactory loggerFactory)

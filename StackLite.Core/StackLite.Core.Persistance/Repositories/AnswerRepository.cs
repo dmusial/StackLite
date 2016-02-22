@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using StackLite.Core.Domain.Answers;
 
@@ -20,11 +19,6 @@ namespace StackLite.Core.Persistance
         {
             var events = _eventStore.GetEventsForAggregate(answerId);
             return new Answer(events);
-        }
-
-        public List<Answer> GetAllFor(Guid questionId)
-        {
-            return new List<Answer>();    
         }
 
         public void Save(Answer answer)

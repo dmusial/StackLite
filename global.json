@@ -2,6 +2,7 @@
   "projects": [
     "StackLite.Core.Domain",
     "StackLite.Core.Persistance",
+    "StackLite.Core.Projections",
 	"StackLite.Core.UI"
   ]
 }

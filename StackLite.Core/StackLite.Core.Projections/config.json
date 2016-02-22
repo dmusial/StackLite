@@ -1,0 +1,7 @@
+{
+    "Data": {
+        "DefaultConnection": {
+            "Connectionstring": "Data Source=.;Initial Catalog=StackLiteReporting;Integrated Security=True;"
+        }
+    }
+}

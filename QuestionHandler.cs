@@ -2,8 +2,9 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using StackLite.Core.Domain.Questions;
 using StackLite.Core.FakeReportingStores;
+using StackLite.Core.ReadModels;
 
-namespace StackLite.Core.EventHandlers
+namespace StackLite.Core.Persistance.EventHandlers
 {
     public interface IQuestionHandler
     {
