@@ -7,8 +7,8 @@
             </div>
         </md-toolbar>
         <md-content  class="question-box">
-            <textarea class="form-control" rows="3"></textarea>
-            <md-button class="md-raised md-primary">Submit</md-button>
+            <textarea class="form-control" rows="3" ng-model="content"></textarea>
+            <md-button class="md-raised md-primary" ng-click="addQuestion(content)">Submit</md-button>
 
         </md-content>
     </div>

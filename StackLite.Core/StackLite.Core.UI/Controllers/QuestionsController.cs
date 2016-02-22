@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using StackLite.Core.Domain.Questions;
 using StackLite.Core.Domain.Users;
 using StackLite.Core.Persistance;
 using StackLite.Core.UI.Models;
+using StackLite.Core.Persistance.ReadModels;
+using System.Linq;
 
 namespace StackLite.Core.UI.Controllers
 {
@@ -23,12 +26,18 @@ namespace StackLite.Core.UI.Controllers
         }
         
         [HttpGet]
-        public string Index()
+        [Route("info")]
+        public string Info()
         {
             int questionsCount = _questionsQuery.AllQuestionsCount();
             return string.Format("Welcome to StackLite! We're currently tracking {0} question(s)!", questionsCount);
         }
         
+         [HttpGet]
+        public IActionResult GetAll()
+        {
+            return new ObjectResult( _questionsQuery.AllQuestions());
+        }
         [HttpGet("{id}")]
         public IActionResult Get(Guid id)
         {
@@ -40,7 +49,6 @@ namespace StackLite.Core.UI.Controllers
         }
         
         [HttpPost]
-        [Route("ask")]
         public IActionResult Ask([FromBody]AskQuestionModel questionModel)
         {
             User user = new User("dmusial");
@@ -53,9 +61,8 @@ namespace StackLite.Core.UI.Controllers
             return new ObjectResult(question);
         }
         
-        [HttpPost]
-        [Route("amend")]
-        public IActionResult Amend([FromBody]AmendQuestionModel questionModel)
+        [HttpPut]
+        public IActionResult Amend(Guid questinId, [FromBody]AmendQuestionModel questionModel)
         {
             var question = _questionRepository.Get(questionModel.QuestionId);
             

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using StackLite.Core.Persistance.ReadModels;
 
@@ -8,6 +9,7 @@ namespace StackLite.Core.Persistance
     {
         int AllQuestionsCount();
         QuestionData GetQuestionDetails(Guid questionId);
+        List<QuestionData> AllQuestions();
     }
 
     public class QuestionsQuery : IQuestionsQuery
@@ -25,6 +27,13 @@ namespace StackLite.Core.Persistance
             using (var context = new ReadContext())
             {
                 return context.Questions.FirstOrDefault(q => q.Id == questionId);
+            }
+        }
+          public List<QuestionData> AllQuestions()
+        {
+             using (var context = new ReadContext())
+            {
+                return context.Questions.ToList();
             }
         }
     }

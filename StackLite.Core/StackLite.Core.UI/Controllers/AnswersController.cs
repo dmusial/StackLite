@@ -9,7 +9,7 @@ using StackLite.Core.UI.Models;
 
 namespace StackLite.Core.UI.Controllers
 {
-    [Route("answers")]
+   [Route("question/{questionId}/answers")]
     public class AnswersController : Controller
     {
         private readonly IAnswerRepository _answerRepository;
@@ -23,19 +23,18 @@ namespace StackLite.Core.UI.Controllers
             _answersQuery = answersQuery;
         }
         
-        [HttpGet("{id}")]
-        [Route("for/{id}")]
-        public IActionResult For(Guid id)
+        [HttpGet]
+        public IActionResult For(Guid questionId)
         {
-            var answers = _answersQuery.GetAllForQuestion(id);
+            var answers = _answersQuery.GetAllForQuestion(questionId);
             
             if (!answers.Any())
-                return new ObjectResult("No answers for this question so far.");
+                return new ObjectResult(new string[0]);
             else
                 return new ObjectResult(answers);
         }
         
-        [HttpPost]
+        [HttpPost("")]
         [Route("suggest")]
         public IActionResult Suggest([FromBody]SuggestAnswerModel answerModel)
         {
@@ -50,25 +49,11 @@ namespace StackLite.Core.UI.Controllers
             
             return new ObjectResult(answer);
         }
+  
         
-        [HttpPost]
-        [Route("amend")]
-        public IActionResult Amend([FromBody]AmendAnswerModel answerModel)
-        {
-            var answer = _answerRepository.Get(answerModel.AnswerId);
-            
-            if (answer == null)
-                return HttpNotFound();
-            
-            answer.AmendContent(answerModel.AnswerContent);
-            _answerRepository.Save(answer);
-            
-            return new ObjectResult(answer);
-        }
-        
-        [HttpPost]
-        [Route("upvote")]
-        public IActionResult Upvote([FromBody]UpvoteModel upvote)
+        [HttpPut]
+        [Route("{answerId}/upvote")]
+        public IActionResult Upvote(Guid answerId,[FromBody]UpvoteModel upvote)
         {
             var answer = _answerRepository.Get(upvote.AnswerId);
             
@@ -84,8 +69,8 @@ namespace StackLite.Core.UI.Controllers
         }
         
         [HttpPost]
-        [Route("downvote")]
-        public IActionResult Downvote([FromBody]DownvoteModel downvote)
+        [Route("{answerId}/downvote")]
+        public IActionResult Downvote(Guid answerId,[FromBody]DownvoteModel downvote)
         {
             var answer = _answerRepository.Get(downvote.AnswerId);
             
@@ -95,6 +80,22 @@ namespace StackLite.Core.UI.Controllers
             User user = new User("dmusial");
             answer.Downvote(user);
             
+            _answerRepository.Save(answer);
+            
+            return new ObjectResult(answer);
+        }
+        
+              
+        [HttpPut("{answerId}")]
+        [Route("amend")]
+        public IActionResult Amend(Guid answerId, [FromBody]AmendAnswerModel answerModel)
+        {
+            var answer = _answerRepository.Get(answerModel.AnswerId);
+            
+            if (answer == null)
+                return HttpNotFound();
+            
+            answer.AmendContent(answerModel.AnswerContent);
             _answerRepository.Save(answer);
             
             return new ObjectResult(answer);

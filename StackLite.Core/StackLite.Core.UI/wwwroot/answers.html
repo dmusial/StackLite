@@ -1,38 +1,40 @@
 <div class="jumbotron">
-    <p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-    <p class="text-left"><small>2 Answers</small></p>
+    <p class="lead">{{::question.Content}}</p>
+    <p class="text-left"><small>"{{::question.AskedByUserName}}"</small></p>
 </div>
 <md-content>
     <md-tabs md-dynamic-height="" md-border-bottom="">
-        <md-tab label="Vote">
+        <md-tab label="Vote ({{answers.length}})">
             <md-content class="md-padding">
                 <div class="row marketing">
-                    <div class="col-lg-12">
-                        <div class="row" ng-repeat-start="a in [1,2,3,4,5,6]">
-                            <div class="col-xs-1 text-right" style="font-size: 26px">
-                                <div class="text-center">
-                                    <i class="fa  fa-chevron-up text-muted" style="display:block"></i>
-                                    <span style="display:block" class="text-muted">0</span>
-                                    <i class="fa fa-chevron-down text-muted" style="display:block"></i>
-                                    <i class="fa fa-star-o text-muted" style="display:block;margin-top:10px"></i>
-                                </div>
-                            </div>
-                            <div class="col-xs-11">
-                                <p style="font-size:larger">Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+                <div class="col-lg-12">
+                    <div class="row" ng-repeat-start="a in answers">
+                        <div class="col-xs-1 text-right" style="font-size: 26px">
+                            <div class="text-center">
+                                <i class="fa  fa-chevron-up text-muted" ng-click="$parent.upvote(a)" style="display: block"></i>
+                                <span style="display: block" class="text-muted">{{a.Votes}}</span>
+                                <i class="fa fa-chevron-down text-muted"  ng-click="$parent.downvote(a)"  style="display: block"></i>
+                                <i class="fa fa-star-o text-muted" style="display: block; margin-top: 10px"></i>
                             </div>
                         </div>
-                        <hr ng-repeat-end>
-                        <div class="row">
-                            <md-toolbar class="md-theme-light">
-                                <div class="md-toolbar-tools">
-                                    <h2><span>Add answer</span></h2>
-                                </div>
-                            </md-toolbar>
-                            <md-content class="question-box">
-                                <textarea class="form-control" rows="3"></textarea>
-                                <md-button class="md-raised md-primary">Submit</md-button>
-                            </md-content>
+                        <div class="col-xs-11">
+                            <p style="font-size: larger">{{::a.Content}}</p>
+                            <small>{{::a.AnsweredByUserName}}</small>
                         </div>
+                    </div>
+                    <hr ng-repeat-end>
+                    <div class="row">
+                        <md-toolbar class="md-theme-light">
+                            <div class="md-toolbar-tools">
+                                <h2><span>Add answer</span></h2>
+                            </div>
+                        </md-toolbar>
+                        <md-content class="question-box">
+                            <textarea class="form-control" ng-model="newAnswer" rows="3"></textarea>
+                            <md-button class="md-raised md-primary" ng-click="addAnswer(newAnswer)">Submit</md-button>
+                        </md-content>
+                    </div>
+                </div>
                     </div>
             </md-content>
         </md-tab>
@@ -44,7 +46,7 @@
         <md-tab label="Oldest">
             <md-content class="md-padding">
                 <h1 class="md-display-2">Active</h1>
-                <p>Integer turpis erat, porttitor vitae mi faucibus, laoreet interdum tellus. Curabitur posuere
+                <p>Integer turpis erat, porttitor vitae mi faucibus, laoreet interdum tellus. Curabitur posuere</p>
             </md-content>
         </md-tab>
     </md-tabs>
