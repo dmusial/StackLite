@@ -14,10 +14,19 @@ gulp.task('buildjs', function() {
         .pipe(gulp.dest("wwwroot"));
 });
 
-gulp.task('copyhtml', function() {
 
+
+gulp.task('buildcss', function() {
+    return gulp.src(["app/css/*"])
+        .pipe(gulp.dest("wwwroot"));
 });
 
-gulp.task('default', ['buildjs', 'copyhtml'], function() {
+
+gulp.task('copyhtml', function() {
+    return gulp.src(["app/src/images/*", "app/src/**/*.html"])
+        .pipe(gulp.dest("wwwroot"));
+});
+
+gulp.task('default', ['buildjs', 'copyhtml','buildcss'], function() {
 
 });
