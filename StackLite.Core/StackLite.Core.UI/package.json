@@ -2,7 +2,8 @@
   "name": "StackLite.Core.UI",
   "version": "0.0.0",
   "devDependencies": {
-    "gulp": "^3.9.1"
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0"
   },
   "dependencies": {}
 }
